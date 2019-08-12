@@ -16,7 +16,7 @@ This plugin requires the following:
 
 # Installation
 
-Install the plugin via the [Prestashop Addons Marketplace](https://addons.prestashop.com).
+Copy the `bitpaycheckout` folder to your `prestashoproot/modules` folder.
 
 
 **WARNING:** 
