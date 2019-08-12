@@ -53,7 +53,7 @@ After the plugin downloaded, verify it is installed by going to ***Modules->Modu
 # IPN
 BitPay Checkout provides an integrated IPN service that will update orders as the status changes.
 
-Initial orders will be set to a **Pending** state, then progress to **Processing**, and finally to **Completed**.  If an invoices is **Expired** (ie, someone creates
+Initial orders will be set to a **Pending** state, then progress to **Processing**, and finally to **Completed**.  If an invoices is **Expired** (ie, someone creates an invoice but does not finish the transaction), the IPN will set the order to `Canceled`
 
 ## Support
 
