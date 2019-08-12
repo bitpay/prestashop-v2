@@ -1,0 +1,19 @@
+{
+  "name": "prestashop/bitpaycheckout",
+  "description": "PrestaShop module bitpaycheckout",
+  "homepage": "https://github.com/PrestaShop/bitpaycheckout",
+  "license": "AFL - Academic Free License (AFL 3.0)",
+  "authors": [
+    {
+      "name": "PrestaShop SA",
+      "email": "contact@prestashop.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.2"
+  },
+  "config": {
+    "preferred-install": "dist"
+  },
+  "type": "prestashop-module"
+}
