@@ -1,4 +1,4 @@
-BitPay Checkout for Woocommerce
+BitPay Checkout for Prestashop
 ===============================
 
 ## Build Status
@@ -87,7 +87,7 @@ The latest version of this plugin can always be downloaded from the official Bit
 
 ## Contribute
 
-Would you like to help with this project?  Great!  You don't have to be a developer, either.  If you've found a bug or have an idea for an improvement, please open an [issue](https://github.com/bitpay/bitpay-checkout-for-woocommerce/issues) and tell us about it.
+Would you like to help with this project?  Great!  You don't have to be a developer, either.  If you've found a bug or have an idea for an improvement, please open an [issue](https://github.com/bitpay/prestashop-v2/issues) and tell us about it.
 
 If you *are* a developer wanting contribute an enhancement, bugfix or other patch to this project, please fork this repository and submit a pull request detailing your changes.  We review all PRs!
 
@@ -95,4 +95,4 @@ This open source project is released under the [MIT license](http://opensource.o
 
 ## License
 
-Please refer to the [LICENSE](https://github.com/bitpay/bitpay-checkout-for-woocommerce/blob/master/LICENSE) file that came with this project.
+Please refer to the [LICENSE](https://github.com/bitpay/prestashop-v2/blob/master/LICENSE) file that came with this project.
