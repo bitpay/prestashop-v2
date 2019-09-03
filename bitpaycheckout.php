@@ -215,6 +215,7 @@ class BitpayCheckout extends PaymentModule
         return array(
             'bitpay_checkout_endpoint' => Configuration::get('bitpay_checkout_endpoint', true),
             'bitpay_checkout_token_dev' => Configuration::get('bitpay_checkout_token_dev', true),
+            'bitpay_checkout_token_prod' => Configuration::get('bitpay_checkout_token_prod', true),
             'bitpay_checkout_flow' => Configuration::get('bitpay_checkout_flow', true),
             'bitpay_checkout_capture_email' => Configuration::get('bitpay_checkout_capture_email', true)
         );
