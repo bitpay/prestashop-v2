@@ -41,7 +41,7 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
 
         if (Configuration::get('bitpay_checkout_endpoint') == 1):
             $env = 'production';
-            $bitpay_token = get_option('bitpay_checkout_token_prod');
+            $bitpay_token = Configuration::get('bitpay_checkout_token_prod');
         endif;
 
         $config = new BPC_Configuration($bitpay_token, $env);
