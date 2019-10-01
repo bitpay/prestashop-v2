@@ -35,7 +35,6 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
         include dirname(__DIR__, $level) . "/BitPayLib/BPC_Item.php";
 
         #BITPAY SPECIFIC INFO
-
         $env = 'test';
         $bitpay_token = Configuration::get('bitpay_checkout_token_dev');
 
@@ -122,7 +121,11 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                     //delete the previous order
                     #update the order and history
                     if ($orderStatus->data->status == 'expired'):
-                        $current_state = 6;
+                        $current_state = Configuration::get('bitpay_checkout_ipn_map');
+                        if($current_state == ''){
+                            $current_state = 6;
+                        }
+                        
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                         $db->Execute($bp_u);

@@ -38,13 +38,13 @@ class BitpayCheckout extends PaymentModule
     public $owner;
     public $address;
     public $extra_mail_vars;
-   
+
     public function __construct()
     {
-     
+
         $this->name = 'bitpaycheckout';
         $this->tab = 'payments_gateways';
-        $this->version = '1.8.0';
+        $this->version = '1.8.1';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->author = 'BitPay';
         $this->need_instance = 1;
@@ -89,7 +89,7 @@ class BitpayCheckout extends PaymentModule
         $helper->identifier = $this->identifier;
         $helper->submit_action = 'submit_bitpaycheckout';
         $helper->currentIndex = $this->context->link->getAdminLink('AdminModules', false)
-            .'&configure='.$this->name.'&tab_module='.$this->tab.'&module_name='.$this->name;
+        . '&configure=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->token = Tools::getAdminTokenLite('AdminModules');
 
         $helper->tpl_vars = array(
@@ -101,7 +101,6 @@ class BitpayCheckout extends PaymentModule
         return $helper->generateForm(array($this->getConfigForm()));
     }
 
-
     /**
      * Define the input of the configuration form
      *
@@ -111,11 +110,12 @@ class BitpayCheckout extends PaymentModule
      */
     protected function getConfigForm()
     {
+        $arr = array("Josh", "Shannon");
         return array(
             'form' => array(
                 'legend' => array(
-                'title' => $this->l('Settings'),
-                'icon' => 'icon-cogs',
+                    'title' => $this->l('Settings'),
+                    'icon' => 'icon-cogs',
                 ),
                 'input' => array(
                     array(
@@ -128,30 +128,44 @@ class BitpayCheckout extends PaymentModule
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Production')
+                                'label' => $this->l('Production'),
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('Development')
-                            )
+                                'label' => $this->l('Development'),
+                            ),
                         ),
                     ),
-                    
+
                     array(
                         'type' => 'text',
                         'label' => $this->l('Development Token'),
                         'name' => 'bitpay_checkout_token_dev',
                         'desc' => $this->l('Your development merchant token.  Create one @ https://test.bitpay.com/dashboard/merchant/api-tokens'),
-                        
+
                     ),
                     array(
                         'type' => 'text',
                         'label' => $this->l('Production Token'),
                         'name' => 'bitpay_checkout_token_prod',
                         'desc' => $this->l('Your production merchant token.  Create one @ https://www.bitpay.com/dashboard/merchant/api-tokens'),
-                        
+
                     ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('IPN Map for Expired orders'),
+                        'name' => 'bitpay_checkout_ipn_map',
+                        'desc' => $this->l('Map order status if a BitPay invoice is not paid.'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
+
                     array(
                         'type' => 'switch',
                         'label' => $this->l('Modal Checkout'),
@@ -161,15 +175,15 @@ class BitpayCheckout extends PaymentModule
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Modal')
+                                'label' => $this->l('Modal'),
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('Redirect')
-                            )
+                                'label' => $this->l('Redirect'),
+                            ),
                         ),
-                        
+
                     ),
                     array(
                         'type' => 'switch',
@@ -180,28 +194,39 @@ class BitpayCheckout extends PaymentModule
                             array(
                                 'id' => 'active_on',
                                 'value' => 1,
-                                'label' => $this->l('Yes')
+                                'label' => $this->l('Yes'),
                             ),
                             array(
                                 'id' => 'active_off',
                                 'value' => 0,
-                                'label' => $this->l('No')
-                            )
+                                'label' => $this->l('No'),
+                            ),
                         ),
-                        
-                    )
-                        
 
+                    ),
 
                 ),
-                
+
                 'submit' => array(
                     'title' => $this->l('Save'),
                 ),
             ),
         );
     }
+    public function getOrderStates()
+    {
 
+        $sql = 'SELECT * FROM ps_order_state_lang ORDER BY name ASC';
+        $results = Db::getInstance()->ExecuteS($sql);
+        $i = 0;
+        foreach ($results as $row) {
+            $arr[$i]['id_option'] = $row['id_order_state'];
+            $arr[$i]['name'] = $row['name'];
+            $i++;
+        }
+        return $arr;
+       
+    }
 
     /**
      * Retrieve the current configuration values.
@@ -217,7 +242,10 @@ class BitpayCheckout extends PaymentModule
             'bitpay_checkout_token_dev' => Configuration::get('bitpay_checkout_token_dev', true),
             'bitpay_checkout_token_prod' => Configuration::get('bitpay_checkout_token_prod', true),
             'bitpay_checkout_flow' => Configuration::get('bitpay_checkout_flow', true),
-            'bitpay_checkout_capture_email' => Configuration::get('bitpay_checkout_capture_email', true)
+            'bitpay_checkout_capture_email' => Configuration::get('bitpay_checkout_capture_email', true),
+            'bitpay_checkout_ipn_map' => Configuration::get('bitpay_checkout_ipn_map', true),
+
+            
         );
     }
 
@@ -259,7 +287,6 @@ class BitpayCheckout extends PaymentModule
         $db = Db::getInstance();
         $db->Execute($sql);
 
-        
         return true;
     }
     public function hookModuleRoutes()
@@ -271,22 +298,23 @@ class BitpayCheckout extends PaymentModule
                 'controller' => 'ipn',
                 'params' => [
                     'fc' => 'module',
-                    'module' => 'bitpaycheckout'
-                ] 
+                    'module' => 'bitpaycheckout',
                 ],
-                'module-bitpaycheckout-cartfix' => [
-                    'rule' => 'bitpaycheckout/cartfix',
-                    'keywords' => [],
-                    'controller' => 'cartfix',
-                    'params' => [
-                        'fc' => 'module',
-                        'module' => 'bitpaycheckout'
-                    ] 
-                ]                
+            ],
+            'module-bitpaycheckout-cartfix' => [
+                'rule' => 'bitpaycheckout/cartfix',
+                'keywords' => [],
+                'controller' => 'cartfix',
+                'params' => [
+                    'fc' => 'module',
+                    'module' => 'bitpaycheckout',
+                ],
+            ],
         ];
     }
 
-    public function uninstall() {
+    public function uninstall()
+    {
         $table_name = '_bitpay_checkout_transactions';
         $sql = "DROP TABLE $table_name";
         $db = Db::getInstance();
@@ -294,11 +322,11 @@ class BitpayCheckout extends PaymentModule
 
         #Configuration::deleteByName('bitpay_APIKEY');
         return parent::uninstall();
-      }
+    }
 
     public function hookDisplayHeader()
     {
-       $this->context->controller->addJS($this->_path.'js/bitpay_ps.js');
+        $this->context->controller->addJS($this->_path . 'js/bitpay_ps.js');
     }
 
     public function hookPaymentOptions($params)
