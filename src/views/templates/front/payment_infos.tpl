@@ -24,5 +24,5 @@
 *}
 
 <section>
-  <p>{l s='Add some details about the payment option' mod='bitpaycheckout'}</p>
+  <p>{l s='Pay with BitPay using one of the supported cryptocurrencies' mod='bitpaycheckout'}</p>
 </section>
