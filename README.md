@@ -18,6 +18,9 @@ This plugin requires the following:
 
 Copy the `bitpaycheckout` folder to your `prestashop-root/modules` folder.
 
+You can also download the zip from the `dist` folder
+[https://github.com/bitpay/prestashop-v2/blob/master/dist/bitpaycheckout.zip](https://github.com/bitpay/prestashop-v2/blob/master/dist/bitpaycheckout.zip)
+
 
 **WARNING:** 
 
@@ -67,7 +70,7 @@ Initial orders will be set to a **Pending** state, then progress to **Processing
 
 ## Troubleshooting
 
-The latest version of this plugin can always be downloaded from the official BitPay repository located @ [https://github.com/bitpay/prestashop](https://github.com/bitpay/prestashop)
+The latest version of this plugin can always be downloaded from the official BitPay repository located @ [https://github.com/bitpay/prestashop-v2](https://github.com/bitpay/prestashop-v2)
 
 * This plugin requires PHP 5.5 or higher to function correctly. Contact your webhosting provider or server administrator if you are unsure which version is installed on your web server.
 * Ensure a valid SSL certificate is installed on your server. Also ensure your root CA cert is updated. If your CA cert is not current, you will see curl SSL verification errors.
