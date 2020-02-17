@@ -87,6 +87,8 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
         global $cookie;
         $module = Module::getInstanceByName('bitpaycheckout');
         $version = $module->version;
+        $errorURL = Configuration::get('bitpay_checkout_error');
+        $errorState = intval(Configuration::get('bitpay_checkout_error_state'));
 
         $currency = new CurrencyCore($cookie->id_currency);
 
@@ -117,20 +119,34 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
                 $params->buyer = $buyerInfo;
             endif;
         endif;
+        $db = Db::getInstance();
+        $db->Execute($bp_sql);
+
+        $db_prefix = _DB_PREFIX_;
 
         $item = new BPC_Item($config, $params);
         $invoice = new BPC_Invoice($item);
         //this creates the invoice with all of the config params from the item
         $invoice->BPC_createInvoice();
         $invoiceData = json_decode($invoice->BPC_getInvoiceData());
+        
+        if (property_exists($invoiceData, 'error')):
+            $order_table = $db_prefix.'orders';
+            if($errorState == 0):
+                $errorState = 8;
+            endif;
+            $bp_u = "UPDATE $order_table SET current_state = $errorState WHERE id_order = '$orderId' AND secure_key = '$customer->secure_key'";
+            $db = Db::getInstance();
+            $db->Execute($bp_u);
+            header("Location: ".$errorURL);
+            die();
+        endif;
         $invoiceID = $invoiceData->data->id;
+
 
         $bitpay_table_name = '_bitpay_checkout_transactions';
         $bp_sql = "INSERT INTO $bitpay_table_name (order_id,transaction_id,customer_key) VALUES ($orderId,'$invoiceID','$customer->secure_key')";
-        $db = Db::getInstance();
-        $db->Execute($bp_sql);
-
-        $db_prefix = _DB_PREFIX_;
+        
 
         $order_table = $db_prefix.'orders';
         $bp_u = "UPDATE $order_table SET current_state = 3 WHERE id_order = '$orderId' AND secure_key = '$customer->secure_key'";

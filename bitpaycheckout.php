@@ -44,7 +44,7 @@ class BitpayCheckout extends PaymentModule
 
         $this->name = 'bitpaycheckout';
         $this->tab = 'payments_gateways';
-        $this->version = '1.8.1';
+        $this->version = '1.9.2020';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->author = 'BitPay';
         $this->need_instance = 1;
@@ -110,7 +110,7 @@ class BitpayCheckout extends PaymentModule
      */
     protected function getConfigForm()
     {
-        $arr = array("Josh", "Shannon");
+        #$arr = array("Josh", "Shannon");
         return array(
             'form' => array(
                 'legend' => array(
@@ -152,6 +152,20 @@ class BitpayCheckout extends PaymentModule
                         'desc' => $this->l('Your production merchant token.  Create one @ https://www.bitpay.com/dashboard/merchant/api-tokens'),
 
                     ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('IPN Map for Confirmed orders'),
+                        'name' => 'bitpay_checkout_ipn_map_confirmed',
+                        'desc' => $this->l('Map order status after the invoice has been confirmed according to your BitPay confirmation setup.'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
+
                     array(
                         'type' => 'select',
                         'label' => $this->l('IPN Map for Expired orders'),
@@ -204,6 +218,26 @@ class BitpayCheckout extends PaymentModule
                         ),
 
                     ),
+                    array(
+                        'type' => 'text',
+                        'label' => $this->l('Error Page'),
+                        'name' => 'bitpay_checkout_error',
+                        'desc' => $this->l('Add a URL for a user to be redirected to if there is an error'),
+
+                    ),
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('Error States'),
+                        'name' => 'bitpay_checkout_error_state',
+                        'desc' => $this->l('If there is an error with the order, what state should the order be mapped to?'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
 
                 ),
 
@@ -244,6 +278,9 @@ class BitpayCheckout extends PaymentModule
             'bitpay_checkout_flow' => Configuration::get('bitpay_checkout_flow', true),
             'bitpay_checkout_capture_email' => Configuration::get('bitpay_checkout_capture_email', true),
             'bitpay_checkout_ipn_map' => Configuration::get('bitpay_checkout_ipn_map', true),
+            'bitpay_checkout_ipn_map_confirmed' => Configuration::get('bitpay_checkout_ipn_map_confirmed', true),
+            'bitpay_checkout_error' => Configuration::get('bitpay_checkout_error', true),
+            'bitpay_checkout_error_state' => Configuration::get('bitpay_checkout_error_state', true),
 
             
         );

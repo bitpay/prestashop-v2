@@ -46,6 +46,12 @@ After the plugin downloaded, verify it is installed by going to ***Modules->Modu
 	* If set to ***No***, then the user will be sent to an invoice at BitPay.com to complete their payment, and then redirected to the merchant site.  	
 	* If set to ***Yes***, the user willl stay on the merchant site and complete their payment.
 	
+* **Error Page**
+	* Create a page to redirect users if there is a BitPay error when placing an order.  
+	
+* **Error States**
+	* If there is an error with the order, choose what state the order should be placed in.  You can use the pre-defined states, or create your own.
+	
 # How to use
 
 * Enable the plugin

@@ -60,8 +60,12 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
             switch ($transaction_status) {
                 case 'invoice_confirmed': #complete
                     if ($orderStatus->data->status == 'confirmed' || $orderStatus->data->status == 'complete'):
+                        $current_state = Configuration::get('bitpay_checkout_ipn_map_confirmed');
+                        if($current_state == ''){
+                            $current_state = 2;
+                        }
                         #update the order and history
-                        $current_state = 2;
+                        
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                         $db->Execute($bp_u);
