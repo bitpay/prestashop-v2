@@ -18,10 +18,6 @@ This plugin requires the following:
 
 Copy the `bitpaycheckout` folder to your `prestashop-root/modules` folder.
 
-You can also download the zip from the `dist` folder
-[https://github.com/bitpay/prestashop-v2/blob/master/dist/bitpaycheckout.zip](https://github.com/bitpay/prestashop-v2/blob/master/dist/bitpaycheckout.zip)
-
-
 **WARNING:** 
 
 * It is good practice to backup your database before installing plugins. Please make sure you create backups.
