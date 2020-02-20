@@ -54,18 +54,26 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
         $orderStatus = json_decode($invoice->BPC_checkInvoiceStatus($transaction_id));
 
         $bp_sql = "SELECT * FROM $table_name WHERE transaction_id = '$transaction_id'";
-        $results = Db::getInstance()->executes($bp_sql);
+  
+        #$results = Db::getInstance()->executes($bp_sql);
+        $db = Db::getInstance();
+        try{
+            $results = $db->Execute($bp_sql);
+
+        }catch (Exception $e) {
+            die($e);
+        }
+        
         if (count($results) == 1):
             $d = $results[0];
             switch ($transaction_status) {
                 case 'invoice_confirmed': #complete
-                    if ($orderStatus->data->status == 'confirmed' || $orderStatus->data->status == 'complete'):
+                    if ($orderStatus->data->status == 'confirmed' || $orderStatus->data->status == 'complete' ):
                         $current_state = Configuration::get('bitpay_checkout_ipn_map_confirmed');
                         if($current_state == ''){
                             $current_state = 2;
                         }
                         #update the order and history
-                        
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                         $db->Execute($bp_u);
@@ -75,7 +83,7 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         $db->Execute($bp_t);
 
                         #update the history table
-                        $order_history_table = 'ps_order_history';
+                       
                         $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 									         VALUES (0,'$orderId',$current_state,NOW())";
                         $db->Execute($bp_h);
@@ -95,7 +103,6 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         $db->Execute($bp_t);
 
                         #update the history table
-                        $order_history_table = 'ps_order_history';
                         $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 									        VALUES (0,'$orderId',$current_state,NOW())";
                         $db->Execute($bp_h);
@@ -115,7 +122,6 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         $db->Execute($bp_t);
 
                         #update the history table
-                        $order_history_table = 'ps_order_history';
                         $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 									         VALUES (0,'$orderId',$current_state,NOW())";
                         $db->Execute($bp_h);
@@ -139,7 +145,6 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         $db->Execute($bp_t);
 
                         #update the history table
-                        $order_history_table = 'ps_order_history';
                         $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 									         VALUES (0,'$orderId',$current_state,NOW())";
                         $db->Execute($bp_h);
@@ -158,7 +163,6 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                     $db->Execute($bp_t);
 
                     #update the history table
-                    $order_history_table = 'ps_order_history';
                     $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 						         VALUES (0,'$orderId',$current_state,NOW())";
                     $db->Execute($bp_h);

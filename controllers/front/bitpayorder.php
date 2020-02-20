@@ -98,18 +98,17 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
         $config = new BPC_Configuration($bitpay_token, $env);
         $params = new stdClass();
 
-        $params->fullNotifications = 'true';
+        $params->extendedNotifications = true;
         $params->extension_version = 'BitPayCheckout_PrestaShop_' . $version;
         $params->price = (float) $cart->getOrderTotal(true, Cart::BOTH);
         $params->currency = $currency->iso_code;
         $params->orderId = $orderId;
 
-        $params->extendedNotifications = true;
         $params->acceptanceWindow = 1200000;
         #redirect
         $params->redirectURL = _PS_BASE_URL_ . __PS_BASE_URI__ . 'index.php?controller=order-detail&id_order=' . $this->module->currentOrder . '&key=' . $customer->secure_key;
         #ipn
-        $params->notificationURL = _PS_BASE_URL_ . __PS_BASE_URI__ . 'module/bitpaycheckout/bitpayipn';
+        $params->notificationURL = _PS_BASE_URL_ . __PS_BASE_URI__ . 'module/bitpaycheckout/ipn';
 
         if (Configuration::get('bitpay_checkout_capture_email') == 1):
             if ($customer->email):
@@ -119,8 +118,11 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
                 $params->buyer = $buyerInfo;
             endif;
         endif;
-        $db = Db::getInstance();
-        $db->Execute($bp_sql);
+        $posInfo = new stdClass();
+        $posInfo->ipn = 
+        $buyerInfo->email = $customer->email;
+        #$params->posData = $params->notificationURL;
+       
 
         $db_prefix = _DB_PREFIX_;
 
@@ -144,9 +146,16 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
         $invoiceID = $invoiceData->data->id;
 
 
-        $bitpay_table_name = '_bitpay_checkout_transactions';
+        $bitpay_table_name = 'bitpay_checkout_transactions';
         $bp_sql = "INSERT INTO $bitpay_table_name (order_id,transaction_id,customer_key) VALUES ($orderId,'$invoiceID','$customer->secure_key')";
-        
+        $db = Db::getInstance();
+        try{
+        $db->Execute($bp_sql);
+        #echo $bp_sql;
+
+        }catch (Exception $e) {
+            #die("Oh noes! There's an error in the query!");
+        }
 
         $order_table = $db_prefix.'orders';
         $bp_u = "UPDATE $order_table SET current_state = 3 WHERE id_order = '$orderId' AND secure_key = '$customer->secure_key'";
