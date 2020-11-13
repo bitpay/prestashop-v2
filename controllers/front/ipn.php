@@ -63,20 +63,29 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
         }catch (Exception $e) {
             die($e);
         }
-        
+       
         if (count($results) == 1):
             $d = $results[0];
             switch ($transaction_status) {
                 case 'invoice_confirmed': #complete
-                    if ($orderStatus->data->status == 'confirmed' || $orderStatus->data->status == 'complete' ):
+              
+                    if ($orderStatus->data->status == 'confirmed' || $orderStatus->data->status == 'complete'):
                         $current_state = Configuration::get('bitpay_checkout_ipn_map_confirmed');
                         if($current_state == ''){
                             $current_state = 2;
                         }
+                        $current_state = (int)$current_state;
+                       
                         #update the order and history
-                        $db = Db::getInstance();
-                        $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
-                        $db->Execute($bp_u);
+                        #$db = Db::getInstance();
+                        #$bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
+                        #$db->Execute($bp_u);
+                        
+                        $objOrder = new Order($orderId); //order with id=1
+                        $history = new OrderHistory();
+                        $history->id_order = $orderId;
+                        $history->changeIdOrderState($current_state, (int)($objOrder->id)); //order status=3
+
 
                         #update the transaction table
                         $bp_t = "UPDATE $table_name SET transaction_status = '$transaction_status' WHERE transaction_id = '$transaction_id' AND order_id = $orderId";
@@ -87,13 +96,23 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 									         VALUES (0,'$orderId',$current_state,NOW())";
                         $db->Execute($bp_h);
+                       
+                        $email_order = new Order((int)$orderId);
+                        $email_customer = new Customer((int)$email_order->id_customer);
+                        #print_r($email_customer);
+                        
+                      
                     endif;
                     break;
 
                 case 'invoice_paidInFull': #pending
                     #update the order and history
                     if ($orderStatus->data->status == 'paid'):
-                        $current_state = 3;
+                        $current_state = Configuration::get('bitpay_checkout_ipn_map_paid');
+                        if($current_state == ''){
+                            $current_state = 3;
+                        }
+                        $current_state = (int)$current_state;
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                         $db->Execute($bp_u);
@@ -112,7 +131,11 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                 case 'invoice_failedToConfirm':
                     #update the order and history
                     if ($orderStatus->data->status == 'invalid'):
-                        $current_state = 8;
+                        $current_state = Configuration::get('bitpay_checkout_ipn_map_failed');
+                        if($current_state == ''){
+                            $current_state = 8;
+                        }
+                        $current_state = (int)$current_state;
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                         $db->Execute($bp_u);
@@ -135,6 +158,7 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                         if($current_state == ''){
                             $current_state = 6;
                         }
+                        $current_state = (int)$current_state;
                         
                         $db = Db::getInstance();
                         $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
@@ -152,8 +176,14 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                     break;
 
                 case 'invoice_refundComplete':
+                    if ($orderStatus->data->status == 'refunded'):
+                        
                     #update the order and history
-                    $current_state = 7;
+                    $current_state = Configuration::get('bitpay_checkout_ipn_map_refunded');
+                        if($current_state == ''){
+                            $current_state = 7;
+                        }
+                    $current_state = (int)$current_state;
                     $db = Db::getInstance();
                     $bp_u = "UPDATE $order_table SET current_state = $current_state WHERE id_order = '$orderId'";
                     $db->Execute($bp_u);
@@ -166,6 +196,7 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                     $bp_h = "INSERT INTO $order_history_table (id_employee,id_order,id_order_state,date_add)
 						         VALUES (0,'$orderId',$current_state,NOW())";
                     $db->Execute($bp_h);
+                    endif;
 
                     break;
 

@@ -44,7 +44,7 @@ class BitpayCheckout extends PaymentModule
 
         $this->name = 'bitpaycheckout';
         $this->tab = 'payments_gateways';
-        $this->version = '1.9.2020';
+        $this->version = '11.13.2020';
         $this->ps_versions_compliancy = array('min' => '1.7', 'max' => _PS_VERSION_);
         $this->author = 'BitPay';
         $this->need_instance = 1;
@@ -152,6 +152,21 @@ class BitpayCheckout extends PaymentModule
                         'desc' => $this->l('Your production merchant token.  Create one @ https://www.bitpay.com/dashboard/merchant/api-tokens'),
 
                     ),
+
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('IPN Map for Paid orders'),
+                        'name' => 'bitpay_checkout_ipn_map_paid',
+                        'desc' => $this->l('Map order status after the invoice has been paid according to your BitPay confirmation setup.'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
+
                     array(
                         'type' => 'select',
                         'label' => $this->l('IPN Map for Confirmed orders'),
@@ -179,6 +194,35 @@ class BitpayCheckout extends PaymentModule
                         ),
 
                     ),
+
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('IPN Map for Failed orders'),
+                        'name' => 'bitpay_checkout_ipn_map_failed',
+                        'desc' => $this->l('Map order status after the invoice failed to confirm according to your BitPay confirmation setup.'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
+
+                    array(
+                        'type' => 'select',
+                        'label' => $this->l('IPN Map for Refunded orders'),
+                        'name' => 'bitpay_checkout_ipn_map_refunded',
+                        'desc' => $this->l('Map order status after the invoice has been refunded from your BitPay Dashboard'),
+                        'options' => array(
+                            'query' => $this->getOrderStates(),
+                            'id' => 'id_option',
+                            'name' => 'name',
+
+                        ),
+
+                    ),
+
 
                     array(
                         'type' => 'switch',
@@ -278,7 +322,12 @@ class BitpayCheckout extends PaymentModule
             'bitpay_checkout_flow' => Configuration::get('bitpay_checkout_flow', true),
             'bitpay_checkout_capture_email' => Configuration::get('bitpay_checkout_capture_email', true),
             'bitpay_checkout_ipn_map' => Configuration::get('bitpay_checkout_ipn_map', true),
+            'bitpay_checkout_ipn_map_paid' => Configuration::get('bitpay_checkout_ipn_map_paid', true),
             'bitpay_checkout_ipn_map_confirmed' => Configuration::get('bitpay_checkout_ipn_map_confirmed', true),
+            'bitpay_checkout_ipn_map_failed' => Configuration::get('bitpay_checkout_ipn_map_failed', true),
+            'bitpay_checkout_ipn_map_refunded' => Configuration::get('bitpay_checkout_ipn_map_refunded', true),
+
+
             'bitpay_checkout_error' => Configuration::get('bitpay_checkout_error', true),
             'bitpay_checkout_error_state' => Configuration::get('bitpay_checkout_error_state', true),
 

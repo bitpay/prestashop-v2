@@ -118,8 +118,6 @@ class BitpayCheckoutBitpayorderModuleFrontController extends ModuleFrontControll
                 $params->buyer = $buyerInfo;
             endif;
         endif;
-        $posInfo = new stdClass();
-        $posInfo->ipn = 
         $buyerInfo->email = $customer->email;
         #$params->posData = $params->notificationURL;
        
