@@ -16,7 +16,7 @@ This plugin requires the following:
 
 # Installation
 
-Drag and drop the the zipped extension into the admin section to install.
+Drag and drop the the zipped extension in the **dist** folder into the admin section to install.
 
 **WARNING:** 
 
