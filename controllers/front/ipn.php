@@ -201,6 +201,7 @@ class BitpayCheckoutIpnModuleFrontController extends AbstractRestController
                     break;
 
             }
+            http_response_code(200);
         endif;
 
     }

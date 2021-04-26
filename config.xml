@@ -2,7 +2,7 @@
 <module>
     <name>bitpaycheckout</name>
     <displayName><![CDATA[BitPay Checkout]]></displayName>
-    <version><![CDATA[11.13.2020]]></version>
+    <version><![CDATA[12.04.2021]]></version>
     <description><![CDATA[Accepts Bitcoin payments via BitPay.]]></description>
     <author><![CDATA[BitPay]]></author>
     <tab><![CDATA[payments_gateways]]></tab>
